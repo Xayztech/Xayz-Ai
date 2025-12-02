@@ -8,49 +8,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
-        body { font-family: 'Outfit', sans-serif; background-color: #131314; color: white; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap');
         
-        .gemini-text {
+        /* BASE STYLES */
+        body { transition: background-color 0.3s, color 0.3s; }
+        
+        /* === THEME: GEMINI (Default) === */
+        body.theme-gemini { font-family: 'Outfit', sans-serif; background-color: #131314; color: white; }
+        .theme-gemini .gradient-text {
             background: linear-gradient(74deg, #4285f4 0, #9b72cb 9%, #d96570 20%, #131314 24%, #131314 35%, #4285f4 40%, #9b72cb 50%, #d96570 60%, #131314 65%, #131314 100%);
-            background-size: 400% 100%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline-block;
+            background-size: 400% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block;
         }
+        .theme-gemini .sidebar-active { background-color: #004a77; color: #c2e7ff; }
+        .theme-gemini .input-box { background-color: #1e1f20; border-radius: 28px; border: 1px solid #444746; }
+        .theme-gemini .input-box:focus-within { background-color: #28292a; border-color: #c2e7ff; }
+        .theme-gemini .suggestion-card { background-color: #1e1f20; border-radius: 12px; }
+        .theme-gemini .suggestion-card:hover { background-color: #333537; }
+        .theme-gemini .user-msg { background-color: #28292a; border-radius: 20px; }
 
-        .suggestion-card {
-            background-color: #1e1f20;
-            border-radius: 12px;
-            padding: 16px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .suggestion-card:hover { background-color: #333537; }
-
-        .sidebar-item { border-radius: 50px; padding: 12px 24px; transition: all 0.2s; }
-        .sidebar-active { background-color: #004a77; color: #c2e7ff; }
-        .sidebar-inactive { color: #e3e3e3; }
-        .sidebar-inactive:hover { background-color: #28292a; }
-
-        .user-msg { background-color: #28292a; border-radius: 20px; padding: 12px 20px; align-self: flex-end; max-width: 80%; }
-        .ai-msg { background: transparent; padding: 0; align-self: flex-start; max-width: 100%; width: 100%; }
+        /* === THEME: CHATGPT (OpenAI Style) === */
+        body.theme-chatgpt { font-family: 'Outfit', sans-serif; background-color: #343541; color: #ececf1; }
+        .theme-chatgpt .gradient-text { background: none; -webkit-text-fill-color: white; color: white; }
+        .theme-chatgpt #sidebar { background-color: #202123 !important; border-right: 1px solid #4d4d4f; }
+        .theme-chatgpt .sidebar-active { background-color: #343541; color: white; border-radius: 6px; }
+        .theme-chatgpt .sidebar-item { border-radius: 6px; }
+        .theme-chatgpt .input-box { background-color: #40414f; border-radius: 12px; border: 1px solid #565869; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .theme-chatgpt .input-box:focus-within { border-color: #10a37f; }
+        .theme-chatgpt .suggestion-card { background-color: #40414f; border: 1px solid #565869; border-radius: 6px; }
+        .theme-chatgpt .suggestion-card:hover { background-color: #2a2b32; }
+        .theme-chatgpt .user-msg { background-color: #444654; border-radius: 6px; }
+        .theme-chatgpt #sendBtn { background-color: #19c37d !important; border-radius: 6px; }
         
-        pre { background: #1e1f20; padding: 15px; border-radius: 8px; overflow-x: auto; margin-top: 10px; border: 1px solid #444746; }
+        /* === THEME: BLACKBOX (Coding Style) === */
+        body.theme-blackbox { font-family: 'JetBrains Mono', monospace; background-color: #000000; color: #00ff00; }
+        .theme-blackbox .gradient-text { background: none; -webkit-text-fill-color: #00ff00; text-shadow: 0 0 10px rgba(0,255,0,0.5); }
+        .theme-blackbox #sidebar { background-color: #0a0a0a !important; border-right: 1px solid #333; }
+        .theme-blackbox .sidebar-active { background-color: #1a1a1a; color: #00ff00; border: 1px solid #00ff00; border-radius: 0; }
+        .theme-blackbox .sidebar-item { border-radius: 0; }
+        .theme-blackbox .input-box { background-color: #0a0a0a; border-radius: 0; border: 1px solid #333; }
+        .theme-blackbox .input-box:focus-within { border-color: #00ff00; box-shadow: 0 0 15px rgba(0,255,0,0.2); }
+        .theme-blackbox .suggestion-card { background-color: #0a0a0a; border: 1px solid #333; border-radius: 0; }
+        .theme-blackbox .suggestion-card:hover { border-color: #00ff00; }
+        .theme-blackbox .user-msg { background-color: #111; border: 1px solid #333; border-radius: 0; color: #00ff00; }
+        .theme-blackbox #sendBtn { background-color: #333 !important; border-radius: 0; color: #00ff00; }
+        .theme-blackbox .ai-msg { font-family: 'JetBrains Mono', monospace; }
+
+        /* COMMON UTILS */
+        .sidebar-item { padding: 12px 16px; margin-bottom: 4px; transition: all 0.2s; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; }
+        .sidebar-inactive { color: #8e8ea0; }
+        .sidebar-inactive:hover { background-color: rgba(255,255,255,0.05); color: white; }
         
+        /* CODE BLOCKS & COPY BTN */
+        pre { position: relative; padding: 0; border-radius: 8px; overflow: hidden; margin: 10px 0; background: #0d0d0d; border: 1px solid #333; }
+        code { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+        .code-header { display: flex; justify-content: space-between; align-items: center; background: #2d2d2d; padding: 6px 12px; font-size: 0.75rem; color: #bbb; }
+        .copy-btn { background: transparent; border: none; color: #fff; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 4px; opacity: 0.7; transition: opacity 0.2s; }
+        .copy-btn:hover { opacity: 1; }
+        pre code { display: block; padding: 12px; overflow-x: auto; color: #e0e0e0; }
+
+        /* LOADER */
         .gemini-loader { height: 4px; width: 100%; background: linear-gradient(90deg, #4285f4, #9b72cb, #d96570); background-size: 200% 100%; animation: loading 2s infinite linear; border-radius: 4px; }
         @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-        .input-box { background-color: #1e1f20; border-radius: 28px; border: 1px solid #444746; transition: border 0.3s; }
-        .input-box:focus-within { border-color: #c2e7ff; background-color: #28292a; }
     </style>
 </head>
-<body class="h-[100dvh] w-full overflow-hidden flex flex-col bg-[#131314]">
+<body class="theme-gemini h-[100dvh] w-full overflow-hidden flex flex-col">
 
     <div id="authPage" class="absolute inset-0 z-[100] flex items-center justify-center bg-[#131314]">
         <div class="p-8 w-full max-w-sm text-center">
-            <h1 class="text-4xl font-bold mb-2 gemini-text">Login To Continue</h1>
+            <h1 class="text-4xl font-bold mb-2 gradient-text">Xayz AI</h1>
             <p class="text-gray-400 mb-8">Masuk untuk melanjutkan</p>
             <form id="loginForm" onsubmit="handleLogin(event)" class="text-left space-y-4">
                 <input type="text" id="loginUser" placeholder="Username" class="w-full p-4 bg-[#1e1f20] rounded-lg border border-[#444746] focus:border-[#4285f4] outline-none text-white" required>
@@ -77,111 +102,99 @@
         <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-[#1e1f20] transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 flex flex-col h-full pt-4">
             <div class="px-6 mb-6 flex justify-between items-center">
-                <div class="text-xl font-medium text-gray-200">Xayz AI</div>
+                <div class="text-xl font-bold tracking-wide">Xayz AI</div>
                 <button onclick="toggleSidebar()" class="md:hidden text-gray-400"><i class="fa-solid fa-bars"></i></button>
             </div>
 
-            <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
-                <div onclick="switchModel('gemini')" class="sidebar-item sidebar-active flex items-center gap-3 cursor-pointer">
+            <nav class="flex-1 px-3 overflow-y-auto">
+                <div class="text-xs font-semibold text-gray-500 mb-2 px-2 mt-2">LLM Models</div>
+                <div onclick="switchModel('gemini')" class="sidebar-item sidebar-active">
                     <i class="fa-solid fa-star"></i> Gemini Flash
                 </div>
-                <div onclick="switchModel('chatgpt')" class="sidebar-item sidebar-inactive flex items-center gap-3 cursor-pointer">
+                <div onclick="switchModel('chatgpt')" class="sidebar-item sidebar-inactive">
                     <i class="fa-solid fa-bolt"></i> ChatGPT
                 </div>
-                <div onclick="switchModel('bing')" class="sidebar-item sidebar-inactive flex items-center gap-3 cursor-pointer">
+                <div onclick="switchModel('bing')" class="sidebar-item sidebar-inactive">
                     <i class="fa-brands fa-microsoft"></i> Bing AI
                 </div>
-                <div onclick="switchModel('blackbox')" class="sidebar-item sidebar-inactive flex items-center gap-3 cursor-pointer">
+                <div onclick="switchModel('blackbox')" class="sidebar-item sidebar-inactive">
                     <i class="fa-solid fa-code"></i> Blackbox
                 </div>
-                <div class="my-4 border-t border-[#444746]"></div>
-                <div class="px-4 text-xs font-bold text-gray-500 mb-2">IMAGE GEN</div>
-                <div onclick="switchModel('img-openai')" class="sidebar-item sidebar-inactive flex items-center gap-3 cursor-pointer">
+                
+                <div class="my-4 border-t border-gray-700 opacity-50"></div>
+                <div class="text-xs font-semibold text-gray-500 mb-2 px-2">Creative</div>
+                <div onclick="switchModel('img-openai')" class="sidebar-item sidebar-inactive">
                     <i class="fa-solid fa-image"></i> OpenAI Image
                 </div>
-                <div onclick="switchModel('img-sd')" class="sidebar-item sidebar-inactive flex items-center gap-3 cursor-pointer">
-                    <i class="fa-solid fa-palette"></i> Stablediffusion
+                <div onclick="switchModel('img-sd')" class="sidebar-item sidebar-inactive">
+                    <i class="fa-solid fa-palette"></i> Stable Diff
                 </div>
             </nav>
 
-            <div class="p-4 border-t border-[#444746]">
-                <button onclick="logout()" class="text-sm text-red-400 flex items-center gap-2 hover:text-red-300">
+            <div class="p-4 border-t border-gray-700">
+                <button onclick="logout()" class="w-full text-left text-sm text-red-400 flex items-center gap-2 hover:text-red-300 transition">
                     <i class="fa-solid fa-sign-out-alt"></i> Keluar
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col h-full relative bg-[#131314] w-full">
+        <main class="flex-1 flex flex-col h-full relative w-full">
             
-            <header class="h-14 flex items-center px-4 md:hidden justify-between">
+            <header class="h-14 flex items-center px-4 md:hidden justify-between shrink-0">
                 <button onclick="toggleSidebar()" class="text-gray-400"><i class="fa-solid fa-bars text-xl"></i></button>
-                <span id="mobileHeaderTitle" class="font-medium">Gemini</span>
-                <div class="w-8 h-8 rounded-full bg-blue-600 text-center leading-8 font-bold text-xs">U</div>
+                <span id="mobileHeaderTitle" class="font-bold">Gemini</span>
+                <div class="w-8 h-8 rounded-full bg-blue-600 text-center leading-8 font-bold text-xs text-white">U</div>
             </header>
 
             <div id="scrollContainer" class="flex-1 overflow-y-auto p-4 flex flex-col items-center">
                 
-                <div id="welcomeScreen" class="w-full max-w-3xl mt-10 md:mt-20 fade-in">
-                    <h1 class="text-4xl md:text-5xl font-medium mb-2"><span class="gemini-text">Halo, <span id="userNameDisplay">User</span></span></h1>
-                    <h2 class="text-4xl md:text-5xl font-medium text-[#444746] mb-12">Ada yang bisa saya bantu?</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 w-full">
-                        <div onclick="fillPrompt('Buatkan rencana liburan ke Bali')" class="suggestion-card h-40 flex flex-col justify-between">
-                            <span class="text-sm text-gray-200">Buatkan rencana liburan ke Bali</span>
-                            <div class="self-end bg-black/20 p-2 rounded-full"><i class="fa-solid fa-plane"></i></div>
-                        </div>
-                        <div onclick="fillPrompt('Jelaskan teori relativitas secara singkat')" class="suggestion-card h-40 flex flex-col justify-between">
-                            <span class="text-sm text-gray-200">Jelaskan teori relativitas</span>
-                            <div class="self-end bg-black/20 p-2 rounded-full"><i class="fa-solid fa-graduation-cap"></i></div>
-                        </div>
-                        <div onclick="fillPrompt('Buatkan kode Python kalkulator')" class="suggestion-card h-40 flex flex-col justify-between">
-                            <span class="text-sm text-gray-200">Buatkan kode Python simple</span>
-                            <div class="self-end bg-black/20 p-2 rounded-full"><i class="fa-solid fa-code"></i></div>
-                        </div>
-                        <div onclick="fillPrompt('Tulis puisi tentang hujan')" class="suggestion-card h-40 flex flex-col justify-between">
-                            <span class="text-sm text-gray-200">Tulis puisi tentang hujan</span>
-                            <div class="self-end bg-black/20 p-2 rounded-full"><i class="fa-solid fa-pen-nib"></i></div>
-                        </div>
+                <div id="welcomeScreen" class="w-full max-w-3xl mt-8 md:mt-16 animate-[fadeIn_0.5s]">
+                    <div class="mb-10">
+                        <h1 class="text-4xl md:text-5xl font-medium mb-2"><span id="welcomeTitle" class="gradient-text">Halo, User</span></h1>
+                        <h2 id="welcomeSubtitle" class="text-3xl md:text-4xl font-medium opacity-60">Ada yang bisa saya bantu?</h2>
                     </div>
+                    
+                    <div id="suggestionGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+                        </div>
                 </div>
 
-                <div id="chatContainer" class="w-full max-w-3xl flex flex-col gap-6 hidden pb-32">
+                <div id="chatContainer" class="w-full max-w-3xl flex flex-col gap-6 hidden pb-32 pt-4">
                 </div>
 
                 <div id="imageResultContainer" class="hidden w-full max-w-2xl flex flex-col items-center mt-10">
                     <div id="imgLoader" class="hidden text-center">
                         <div class="gemini-loader w-64 mb-4"></div>
-                        <p class="text-gray-400 animate-pulse">Sedang menggambar...</p>
+                        <p class="opacity-70 animate-pulse">Sedang memproses gambar...</p>
                     </div>
-                    <img id="generatedImage" class="hidden rounded-xl shadow-2xl border border-gray-700 w-full">
-                    <a id="dlBtn" class="hidden mt-4 bg-[#c2e7ff] text-[#001d35] px-6 py-2 rounded-full font-bold">Download</a>
+                    <img id="generatedImage" class="hidden rounded-lg shadow-2xl border border-gray-600 w-full">
+                    <a id="dlBtn" class="hidden mt-6 bg-blue-600 text-white px-6 py-2 rounded-full font-bold hover:bg-blue-700 transition">Download Gambar</a>
                 </div>
             </div>
 
-            <div class="w-full bg-[#131314] p-4 flex justify-center shrink-0">
+            <div class="w-full p-4 flex justify-center shrink-0">
                 <div class="w-full max-w-3xl relative">
                     
-                    <div id="filePreview" class="hidden absolute -top-12 left-0 bg-[#1e1f20] px-4 py-2 rounded-t-lg border border-[#444746] border-b-0 flex items-center gap-2">
-                        <i class="fa-solid fa-image text-[#c2e7ff]"></i>
+                    <div id="filePreview" class="hidden absolute -top-12 left-0 bg-[#1e1f20] px-4 py-2 rounded-t-lg border border-gray-600 border-b-0 flex items-center gap-2">
+                        <i class="fa-solid fa-paperclip text-blue-400"></i>
                         <span id="fileName" class="text-xs text-gray-300 truncate max-w-[150px]">img.jpg</span>
                         <button onclick="clearFile()" class="text-red-400 hover:text-red-300 ml-2"><i class="fa-solid fa-times"></i></button>
                     </div>
 
-                    <div class="input-box flex items-center px-2 py-2">
-                        <div id="uploadBtnWrapper" class="hidden">
-                            <label for="fileInput" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#333537] cursor-pointer text-gray-400 hover:text-white transition">
-                                <i class="fa-solid fa-plus text-lg"></i>
+                    <div class="input-box flex items-center px-3 py-2">
+                        <div id="uploadBtnWrapper" class="hidden mr-2">
+                            <label for="fileInput" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 cursor-pointer transition">
+                                <i class="fa-solid fa-plus text-lg opacity-70"></i>
                             </label>
                             <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(this)">
                         </div>
 
-                        <textarea id="promptInput" rows="1" placeholder="Masukkan perintah di sini" class="flex-1 bg-transparent border-none outline-none text-white px-4 py-3 max-h-40 resize-none placeholder-gray-500"></textarea>
+                        <textarea id="promptInput" rows="1" placeholder="Ketik pesan..." class="flex-1 bg-transparent border-none outline-none px-2 py-3 max-h-40 resize-none placeholder-gray-500"></textarea>
 
-                        <button onclick="sendRequest()" id="sendBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#333537] text-white transition">
+                        <button onclick="sendRequest()" id="sendBtn" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition ml-2">
                             <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </div>
-                    <p class="text-center text-[10px] text-gray-500 mt-2">Xayz AI dapat menampilkan info yang tidak akurat.</p>
+                    <p class="text-center text-[10px] opacity-50 mt-2">AI dapat membuat kesalahan. Periksa informasi penting.</p>
                 </div>
             </div>
         </main>
@@ -194,6 +207,7 @@
         let selectedFile = null;
         let abortController = null;
 
+        // AUTH
         async function handleLogin(e) {
             e.preventDefault();
             const u = document.getElementById('loginUser').value;
@@ -220,72 +234,268 @@
                     body: JSON.stringify({ username: u, password: p, firstName: f, lastName: l })
                 });
                 const data = await res.json();
-                if(data.message) {
-                    alert("Registrasi berhasil. Silakan Login.");
-                    toggleAuth('login');
-                } else {
-                    alert(data.error);
-                }
-            } catch(e) { alert("Error connecting to server"); }
+                if(data.message) { alert("Berhasil. Silakan Login."); toggleAuth('login'); }
+                else alert(data.error);
+            } catch(e) { alert("Error"); }
         }
 
         function toggleAuth(page) {
-            document.getElementById('loginForm').parentElement.querySelector('p').classList.toggle('hidden'); 
-            if(page==='register') { 
-                document.getElementById('loginForm').classList.add('hidden'); 
-                document.getElementById('registerForm').classList.remove('hidden'); 
-            } else { 
-                document.getElementById('registerForm').classList.add('hidden'); 
-                document.getElementById('loginForm').classList.remove('hidden'); 
-            }
+            if(page==='register') { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
+            else { document.getElementById('registerForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); }
         }
 
         function initApp(user) {
             currentUser = user;
             document.getElementById('authPage').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('userNameDisplay').innerText = user.firstName;
             switchModel('gemini');
         }
 
+        // --- THEME & MODEL SWITCHING ---
         function switchModel(model) {
             if (abortController) abortController.abort();
             abortController = new AbortController();
-
             currentModel = model;
-            
-            document.getElementById('chatContainer').innerHTML = '';
-            document.getElementById('welcomeScreen').classList.remove('hidden');
-            document.getElementById('chatContainer').classList.add('hidden');
-            
-            document.getElementById('imageResultContainer').classList.add('hidden');
-            document.getElementById('generatedImage').classList.add('hidden');
-            document.getElementById('dlBtn').classList.add('hidden');
 
+            // Apply Theme Classes to BODY
+            document.body.className = 'h-[100dvh] w-full overflow-hidden flex flex-col'; // Reset
+            if (model === 'gemini' || model.startsWith('img-')) document.body.classList.add('theme-gemini');
+            else if (model === 'chatgpt') document.body.classList.add('theme-chatgpt');
+            else if (model === 'blackbox') document.body.classList.add('theme-blackbox');
+            else document.body.classList.add('theme-gemini'); // Default
+
+            // Sidebar Active State
             document.querySelectorAll('.sidebar-item').forEach(el => {
-                el.classList.remove('sidebar-active', 'bg-[#004a77]', 'text-[#c2e7ff]');
+                el.classList.remove('sidebar-active');
                 el.classList.add('sidebar-inactive');
             });
             event.currentTarget.classList.remove('sidebar-inactive');
             event.currentTarget.classList.add('sidebar-active');
 
-            const upWrapper = document.getElementById('uploadBtnWrapper');
-            if(model === 'gemini') {
-                upWrapper.classList.remove('hidden');
-            } else {
-                upWrapper.classList.add('hidden');
-                clearFile();
-            }
-
+            // Reset UI
+            document.getElementById('chatContainer').innerHTML = '';
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('chatContainer').classList.add('hidden');
+            document.getElementById('imageResultContainer').classList.add('hidden');
             document.getElementById('mobileHeaderTitle').innerText = model.toUpperCase();
+
+            // Setup Specific Features
+            const upWrapper = document.getElementById('uploadBtnWrapper');
+            const welcomeTitle = document.getElementById('welcomeTitle');
+            const welcomeSub = document.getElementById('welcomeSubtitle');
             
+            // Welcome Text & Upload Btn Logic
+            let userName = currentUser ? currentUser.firstName : 'User';
+            if (model === 'gemini') {
+                upWrapper.classList.remove('hidden');
+                welcomeTitle.innerText = `Halo, ${userName}`;
+                welcomeTitle.className = 'gradient-text';
+                welcomeSub.innerText = 'Ada yang bisa saya bantu?';
+                renderSuggestions('gemini');
+            } else if (model === 'chatgpt') {
+                upWrapper.classList.add('hidden');
+                welcomeTitle.innerText = 'ChatGPT';
+                welcomeTitle.className = '';
+                welcomeSub.innerText = 'How can I help you today?';
+                renderSuggestions('text');
+            } else if (model === 'blackbox') {
+                upWrapper.classList.add('hidden');
+                welcomeTitle.innerText = 'Blackbox AI';
+                welcomeTitle.className = 'gradient-text';
+                welcomeSub.innerText = '// What are we coding?';
+                renderSuggestions('code');
+            } else {
+                // Image Models
+                upWrapper.classList.add('hidden');
+                welcomeTitle.innerText = 'Image Gen';
+                welcomeTitle.className = '';
+                welcomeSub.innerText = 'Deskripsikan imajinasimu.';
+                renderSuggestions('image');
+            }
+            clearFile();
             if(window.innerWidth < 768) toggleSidebar();
         }
 
-        function fillPrompt(text) {
-            document.getElementById('promptInput').value = text;
+        // --- SUGGESTION SYSTEM (AUTO SEND) ---
+        function renderSuggestions(type) {
+            const grid = document.getElementById('suggestionGrid');
+            grid.innerHTML = '';
+            
+            const suggestions = {
+                gemini: [
+                    { t: 'Buatkan rencana liburan ke Bali', i: 'fa-plane' },
+                    { t: 'Jelaskan teori relativitas', i: 'fa-brain' },
+                    { t: 'Resep nasi goreng spesial', i: 'fa-utensils' },
+                    { t: 'Tips belajar coding', i: 'fa-code' }
+                ],
+                text: [
+                    { t: 'Explain quantum computing', i: 'fa-atom' },
+                    { t: 'Write a professional email', i: 'fa-envelope' },
+                    { t: 'Summarize this article', i: 'fa-file-lines' },
+                    { t: 'Creative story about space', i: 'fa-rocket' }
+                ],
+                code: [
+                    { t: 'Create a Python Calculator', i: 'fa-calculator' },
+                    { t: 'Explain React Hooks', i: 'fa-brands fa-react' },
+                    { t: 'Fix this bug in my code', i: 'fa-bug' },
+                    { t: 'Write a SQL query', i: 'fa-database' }
+                ],
+                image: [
+                    { t: 'Cyberpunk city street at night', i: 'fa-city' },
+                    { t: 'Cute cat astronaut in space', i: 'fa-cat' },
+                    { t: 'Realistic portrait of a warrior', i: 'fa-user-ninja' },
+                    { t: 'Oil painting of a mountain', i: 'fa-mountain' }
+                ]
+            };
+
+            const selected = suggestions[type] || suggestions.gemini;
+            
+            selected.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-card p-4 flex flex-col justify-between h-32 cursor-pointer transition';
+                div.onclick = () => handleSuggestionClick(s.t); // Auto Send Trigger
+                div.innerHTML = `
+                    <span class="text-sm opacity-90">${s.t}</span>
+                    <div class="self-end p-2 bg-white/5 rounded-full"><i class="fa-solid ${s.i}"></i></div>
+                `;
+                grid.appendChild(div);
+            });
         }
 
+        function handleSuggestionClick(text) {
+            document.getElementById('promptInput').value = text;
+            // Jika bukan image generator, langsung kirim
+            if (!currentModel.startsWith('img-')) {
+                sendRequest();
+            }
+        }
+
+        // --- CORE CHAT LOGIC ---
+        function appendUserMessage(text) {
+            const c = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = 'user-msg p-3 text-sm self-end max-w-[85%] mb-4';
+            div.innerText = text;
+            c.appendChild(div);
+        }
+
+        function appendAIMessage(htmlContent) {
+            const c = document.getElementById('chatContainer');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'w-full flex gap-3 animate-[fadeIn_0.3s] mb-6';
+            
+            let icon = 'fa-star';
+            if(currentModel==='chatgpt') icon='fa-bolt';
+            if(currentModel==='blackbox') icon='fa-code';
+            
+            wrapper.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shrink-0 h-max">
+                    <i class="fa-solid ${icon} text-white text-xs"></i>
+                </div>
+                <div class="ai-msg flex-1 text-sm overflow-hidden leading-relaxed">
+                    ${htmlContent}
+                </div>
+            `;
+            c.appendChild(wrapper);
+            
+            // Add Copy Buttons to Code Blocks
+            wrapper.querySelectorAll('pre').forEach(pre => {
+                const code = pre.querySelector('code').innerText;
+                const header = document.createElement('div');
+                header.className = 'code-header';
+                header.innerHTML = `<span>Code</span><button class="copy-btn" onclick="copyToClipboard(this, \`${encodeURIComponent(code)}\`)"><i class="fa-regular fa-copy"></i> Copy</button>`;
+                pre.insertBefore(header, pre.firstChild);
+            });
+
+            document.getElementById('scrollContainer').scrollTop = document.getElementById('scrollContainer').scrollHeight;
+        }
+
+        function copyToClipboard(btn, encodedCode) {
+            const code = decodeURIComponent(encodedCode);
+            navigator.clipboard.writeText(code).then(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+                setTimeout(() => btn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy', 2000);
+            });
+        }
+
+        async function sendRequest() {
+            if(isGenerating) return;
+            const input = document.getElementById('promptInput');
+            const text = input.value.trim();
+            if(!text && !selectedFile) return;
+
+            isGenerating = true;
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('chatContainer').classList.remove('hidden');
+
+            if(currentModel.startsWith('img-')) {
+                document.getElementById('chatContainer').classList.add('hidden');
+                document.getElementById('imageResultContainer').classList.remove('hidden');
+                document.getElementById('imgLoader').classList.remove('hidden');
+                document.getElementById('generatedImage').classList.add('hidden');
+                document.getElementById('dlBtn').classList.add('hidden');
+            } else {
+                appendUserMessage(text);
+            }
+            
+            input.value = '';
+            
+            const loadingId = 'loading-' + Date.now();
+            if(!currentModel.startsWith('img-')) {
+                const c = document.getElementById('chatContainer');
+                const ld = document.createElement('div');
+                ld.id = loadingId;
+                ld.className = 'ml-11 gemini-loader w-24 mb-4';
+                c.appendChild(ld);
+            }
+
+            try {
+                const reqModel = currentModel;
+                let endpoint = currentModel === 'gemini' ? '/api/gemini' : '/api/chat';
+                
+                if(currentModel.startsWith('img-')) {
+                    const res = await fetch('/api/image', {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ prompt: text, model: currentModel === 'img-openai' ? 'openai' : 'stablediffusion' }),
+                        signal: abortController.signal
+                    });
+                    const data = await res.json();
+                    if(currentModel !== reqModel) return;
+                    document.getElementById('imgLoader').classList.add('hidden');
+                    document.getElementById('generatedImage').src = data.imageUrl;
+                    document.getElementById('generatedImage').classList.remove('hidden');
+                    document.getElementById('dlBtn').classList.remove('hidden');
+                    document.getElementById('dlBtn').href = data.imageUrl;
+                    document.getElementById('dlBtn').download = "ai-image.jpg";
+                } else {
+                    let res;
+                    if(currentModel === 'gemini') {
+                        const fd = new FormData();
+                        fd.append('message', text);
+                        if(selectedFile) fd.append('file', selectedFile);
+                        res = await fetch(endpoint, { method: 'POST', body: fd, signal: abortController.signal });
+                    } else {
+                        res = await fetch(endpoint, {
+                            method: 'POST', headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ message: text, model: currentModel }),
+                            signal: abortController.signal
+                        });
+                    }
+                    const data = await res.json();
+                    if(currentModel !== reqModel) return;
+                    if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                    clearFile();
+                    appendAIMessage(marked.parse(data.reply));
+                }
+            } catch(e) {
+                if(e.name !== 'AbortError') {
+                   if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+                }
+            }
+            isGenerating = false;
+        }
+
+        // UTILS
         function handleFileSelect(input) {
             if(input.files && input.files[0]) {
                 selectedFile = input.files[0];
@@ -298,144 +508,15 @@
             document.getElementById('fileInput').value = '';
             document.getElementById('filePreview').classList.add('hidden');
         }
-
-        function appendUserMessage(text) {
-            const container = document.getElementById('chatContainer');
-            const div = document.createElement('div');
-            div.className = 'user-msg text-sm';
-            div.innerText = text;
-            container.appendChild(div);
-        }
-
-        function appendAIMessage(htmlContent) {
-            const container = document.getElementById('chatContainer');
-            const wrapper = document.createElement('div');
-            wrapper.className = 'w-full flex gap-4 animate-[fadeIn_0.3s]';
-            
-            let iconClass = 'fa-star';
-            if(currentModel === 'chatgpt') iconClass = 'fa-bolt';
-            if(currentModel === 'bing') iconClass = 'fa-brands fa-microsoft';
-            if(currentModel === 'blackbox') iconClass = 'fa-code';
-            
-            wrapper.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-red-500 flex items-center justify-center shrink-0 mt-1">
-                    <i class="fa-solid ${iconClass} text-white text-xs"></i>
-                </div>
-                <div class="ai-msg text-gray-200 text-sm leading-relaxed overflow-hidden">
-                    ${htmlContent}
-                </div>
-            `;
-            container.appendChild(wrapper);
-            const scroller = document.getElementById('scrollContainer');
-            scroller.scrollTop = scroller.scrollHeight;
-        }
-
-        async function sendRequest() {
-            if(isGenerating) return;
-            const input = document.getElementById('promptInput');
-            const text = input.value.trim();
-            if(!text && !selectedFile) return;
-
-            isGenerating = true;
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('chatContainer').classList.remove('hidden');
-            
-            if(currentModel.startsWith('img-')) {
-                document.getElementById('chatContainer').classList.add('hidden');
-                document.getElementById('imageResultContainer').classList.remove('hidden');
-                document.getElementById('imgLoader').classList.remove('hidden');
-                document.getElementById('generatedImage').classList.add('hidden');
-                document.getElementById('dlBtn').classList.add('hidden');
-            } else {
-                appendUserMessage(text);
-            }
-            
-            input.value = '';
-            const loadingId = 'loading-' + Date.now();
-            
-            if(!currentModel.startsWith('img-')) {
-                const container = document.getElementById('chatContainer');
-                const loadDiv = document.createElement('div');
-                loadDiv.id = loadingId;
-                loadDiv.className = 'ml-12 gemini-loader w-24 mt-4'; 
-                container.appendChild(loadDiv);
-            }
-
-            try {
-                const requestModel = currentModel;
-                
-                let endpoint = currentModel === 'gemini' ? '/api/gemini' : '/api/chat';
-                
-                if(currentModel.startsWith('img-')) {
-                    const res = await fetch('/api/image', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ prompt: text, model: currentModel === 'img-openai' ? 'openai' : 'stablediffusion' }),
-                        signal: abortController.signal
-                    });
-                    const data = await res.json();
-                    
-                    if(currentModel !== requestModel) return;
-
-                    document.getElementById('imgLoader').classList.add('hidden');
-                    document.getElementById('generatedImage').src = data.imageUrl;
-                    document.getElementById('generatedImage').classList.remove('hidden');
-                    document.getElementById('dlBtn').href = data.imageUrl;
-                    document.getElementById('dlBtn').download = "xayz-ai.jpg";
-                    document.getElementById('dlBtn').classList.remove('hidden');
-
-                } else {
-                    let res;
-                    if(currentModel === 'gemini') {
-                        const fd = new FormData();
-                        fd.append('message', text);
-                        if(selectedFile) fd.append('file', selectedFile);
-                        res = await fetch(endpoint, { method: 'POST', body: fd, signal: abortController.signal });
-                    } else {
-                        res = await fetch(endpoint, {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ message: text, model: currentModel }),
-                            signal: abortController.signal
-                        });
-                    }
-                    
-                    const data = await res.json();
-                    
-                    if(currentModel !== requestModel) return;
-
-                    if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
-                    clearFile();
-                    appendAIMessage(marked.parse(data.reply));
-                }
-
-            } catch(e) {
-                if(e.name !== 'AbortError') {
-                    if(document.getElementById(loadingId)) document.getElementById(loadingId).remove();
-                }
-            }
-            
-            isGenerating = false;
-        }
-
         function toggleSidebar() {
             const sb = document.getElementById('sidebar');
             const ov = document.getElementById('sidebarOverlay');
-            if(sb.classList.contains('-translate-x-full')) {
-                sb.classList.remove('-translate-x-full'); ov.classList.remove('hidden');
-            } else {
-                sb.classList.add('-translate-x-full'); ov.classList.add('hidden');
-            }
+            sb.classList.toggle('-translate-x-full');
+            ov.classList.toggle('hidden');
         }
-        
-        async function logout() {
-            await fetch('/api/logout', {method:'POST'});
-            window.location.reload();
-        }
-
+        async function logout() { await fetch('/api/logout', {method:'POST'}); window.location.reload(); }
         const tx = document.getElementById('promptInput');
         tx.addEventListener("input", function(){ this.style.height="auto"; this.style.height=(this.scrollHeight)+"px"; });
-
         fetch('/api/me').then(r=>r.json()).then(d=>{ if(d.loggedIn) initApp(d.user); });
 
     </script>
