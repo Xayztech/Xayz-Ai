@@ -1,4 +1,3 @@
-// server.js - FINAL DEBUG VERSION
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
@@ -22,7 +21,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// --- DEBUGGING LOGS (Cek di Vercel Functions Logs) ---
 console.log("-----------------------------------------");
 console.log("SERVER STARTING...");
 console.log("GEMINI KEY STATUS:", process.env.GEMINI_API_KEY ? "ADA (Loaded)" : "TIDAK ADA (Missing!)");
@@ -31,8 +29,6 @@ console.log("-----------------------------------------");
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const BOTCAHX_API_KEY = process.env.BOTCAHX_API_KEY || "XYCoolcraftNihBoss"; 
 
-// --- DATABASE SETUP (SAFE MODE) ---
-// Kita bungkus DB dalam try-catch agar server tidak crash jika DB gagal
 let db;
 try {
     const dbPath = path.resolve('/tmp/users.db');
@@ -53,12 +49,10 @@ try {
     console.error("Database Error (Abaikan jika fitur chat yang utama):", error);
 }
 
-// --- ROUTE HALAMAN UTAMA ---
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// --- API AUTH ---
 app.post('/api/login', (req, res) => {
     if(!db) return res.status(500).json({ error: "Database error (Vercel Limit)" });
     const { username, password } = req.body;
@@ -103,7 +97,6 @@ app.post('/api/logout', (req, res) => {
     res.json({ success: true });
 });
 
-// --- API GEMINI (DENGAN ERROR REPORTING) ---
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 function fileToGenerativePart(path, mimeType) {
@@ -118,7 +111,6 @@ function fileToGenerativePart(path, mimeType) {
 app.post('/api/gemini', upload.single('file'), async (req, res) => {
     console.log("Menerima Request Gemini...");
     
-    // 1. Cek API Key
     if (!GEMINI_API_KEY) {
         console.error("FATAL: API Key Kosong");
         return res.status(500).json({ error: "API Key Server belum disetting di Vercel!" });
@@ -131,14 +123,13 @@ app.post('/api/gemini', upload.single('file'), async (req, res) => {
         console.log("Pesan:", message);
         if(file) console.log("File diterima:", file.mimetype);
 
-        // 2. Inisialisasi Model
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         
         let result;
         if (file) {
             const imagePart = fileToGenerativePart(file.path, file.mimetype);
             result = await model.generateContent([message || "Jelaskan file ini", imagePart]);
-            fs.unlinkSync(file.path); // Hapus file temp
+            fs.unlinkSync(file.path);
         } else {
             result = await model.generateContent(message);
         }
@@ -150,9 +141,8 @@ app.post('/api/gemini', upload.single('file'), async (req, res) => {
         res.json({ reply: text });
 
     } catch (error) {
-        console.error("GEMINI ERROR FULL:", error); // Ini akan muncul di Log Vercel
+        console.error("GEMINI ERROR FULL:", error);
         
-        // Kirim detail error ke frontend agar kamu bisa baca
         res.status(500).json({ 
             error: error.message || "Terjadi kesalahan pada Google AI",
             details: error.toString()
@@ -160,7 +150,6 @@ app.post('/api/gemini', upload.single('file'), async (req, res) => {
     }
 });
 
-// --- API LAINNYA ---
 app.post('/api/chat', async (req, res) => {
     const { message, model } = req.body;
     let apiUrl = '';
@@ -185,7 +174,6 @@ app.post('/api/image', async (req, res) => {
     res.json({ imageUrl: imageUrl });
 });
 
-// Export untuk Vercel
 module.exports = app;
 
 if (require.main === module) {
