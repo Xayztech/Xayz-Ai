@@ -2,161 +2,166 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xayz AI - Intelligence</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Xayz AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Custom Animations & Styles */
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
-        
         body { font-family: 'Outfit', sans-serif; background-color: #0f172a; color: white; }
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .sidebar-item { transition: all 0.3s ease; cursor: pointer; }
-        .sidebar-item:hover, .sidebar-item.active { background: #3b82f6; color: white; transform: translateX(5px); }
         
-        .chat-bubble { max-width: 80%; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem; animation: fadeIn 0.3s ease; }
-        .user-msg { background: #2563eb; color: white; align-self: flex-end; margin-left: auto; }
-        .ai-msg { background: #1e293b; color: #e2e8f0; align-self: flex-start; border: 1px solid #334155; }
+        /* Glass Effect */
+        .glass { background: rgba(30, 41, 59, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
         
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 2s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Sidebar Transition */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        .sidebar-open { transform: translateX(0) !important; }
+        .sidebar-closed { transform: translateX(-100%); }
+        
+        /* Chat Styles */
+        .chat-bubble { max-width: 85%; border-radius: 1rem; padding: 0.8rem 1rem; margin-bottom: 0.8rem; line-height: 1.5; font-size: 0.95rem; }
+        .user-msg { background: #2563eb; color: white; align-self: flex-end; border-bottom-right-radius: 0.2rem; }
+        .ai-msg { background: #1e293b; color: #e2e8f0; align-self: flex-start; border: 1px solid #334155; border-bottom-left-radius: 0.2rem; }
+        
+        /* Markdown Styles fix */
+        .ai-msg pre { background: #0f172a; padding: 10px; border-radius: 8px; overflow-x: auto; margin-top: 5px; }
+        .ai-msg code { font-family: monospace; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        /* Loader */
+        .loader { width: 8px; height: 8px; border-radius: 50%; background-color: #fff; box-shadow: 12px 0 #fff, -12px 0 #fff; animation: flash 0.5s ease-out infinite alternate; }
+        @keyframes flash { 0% { background-color: #FFF2; box-shadow: 12px 0 #FFF2, -12px 0 #FFF; } 50% { background-color: #FFF; box-shadow: 12px 0 #FFF2, -12px 0 #FFF2; } 100% { background-color: #FFF2; box-shadow: 12px 0 #FFF, -12px 0 #FFF2; } }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex flex-col">
+<body class="h-[100dvh] w-full overflow-hidden flex flex-col">
 
-    <div id="authPage" class="absolute inset-0 z-50 flex items-center justify-center bg-slate-900 bg-[url('https://source.unsplash.com/random/1920x1080/?technology')] bg-cover bg-center">
-        <div class="absolute inset-0 bg-slate-900/90"></div>
-        
-        <div id="loginForm" class="relative glass p-8 rounded-2xl shadow-2xl w-full max-w-md animate-fade-in-up">
-            <h1 class="text-3xl font-bold text-center mb-2 text-blue-400">Xayz AI</h1>
-            <p class="text-center text-gray-400 mb-6">Masuk untuk menjelajahi masa depan.</p>
-            <form onsubmit="handleLogin(event)">
-                <input type="text" id="loginUser" placeholder="Username" class="w-full p-3 mb-4 bg-slate-800 rounded border border-slate-700 focus:border-blue-500 outline-none transition" required>
-                <input type="password" id="loginPass" placeholder="Password" class="w-full p-3 mb-4 bg-slate-800 rounded border border-slate-700 focus:border-blue-500 outline-none transition" required>
-                <div class="flex items-center mb-6">
-                    <input type="checkbox" id="rememberMe" class="mr-2 h-4 w-4">
-                    <label for="rememberMe" class="text-sm text-gray-400">Ingat Saya</label>
+    <div id="authPage" class="absolute inset-0 z-[60] flex items-center justify-center bg-slate-900">
+        <div class="glass p-6 rounded-2xl w-full max-w-sm m-4 shadow-2xl border-t border-blue-500/50">
+            <h1 class="text-3xl font-bold text-center mb-1 text-blue-400">Xayz AI</h1>
+            <p class="text-center text-xs text-slate-400 mb-6 tracking-widest">NEXT GEN INTELLIGENCE</p>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="space-y-3">
+                    <input type="text" id="loginUser" placeholder="Username" class="w-full p-3 bg-slate-800/50 rounded-lg border border-slate-700 focus:border-blue-500 outline-none transition text-sm" required>
+                    <input type="password" id="loginPass" placeholder="Password" class="w-full p-3 bg-slate-800/50 rounded-lg border border-slate-700 focus:border-blue-500 outline-none transition text-sm" required>
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold transition transform hover:scale-105">Masuk</button>
+                <div class="flex items-center mt-4 mb-6">
+                    <input type="checkbox" id="rememberMe" class="mr-2">
+                    <label for="rememberMe" class="text-xs text-slate-400">Ingat Saya</label>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-bold text-sm shadow-lg shadow-blue-600/30">MASUK</button>
+                <p class="mt-4 text-center text-xs text-slate-400">Belum punya akun? <a href="#" onclick="toggleAuth('register')" class="text-blue-400 font-bold">Sign In</a></p>
             </form>
-            <p class="mt-4 text-center text-sm text-gray-400">Belum punya akun? <a href="#" onclick="toggleAuth('register')" class="text-blue-400 hover:underline">Sign In</a></p>
-        </div>
 
-        <div id="registerForm" class="hidden relative glass p-8 rounded-2xl shadow-2xl w-full max-w-md">
-            <h1 class="text-2xl font-bold text-center mb-6 text-blue-400">Buat Akun</h1>
-            <form onsubmit="handleRegister(event)">
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <input type="text" id="regFirst" placeholder="First Name" class="bg-slate-800 p-3 rounded border border-slate-700 outline-none" required>
-                    <input type="text" id="regLast" placeholder="Last Name" class="bg-slate-800 p-3 rounded border border-slate-700 outline-none" required>
+            <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <input type="text" id="regFirst" placeholder="Nama Depan" class="p-3 bg-slate-800/50 rounded-lg border border-slate-700 outline-none text-sm" required>
+                    <input type="text" id="regLast" placeholder="Nama Belakang" class="p-3 bg-slate-800/50 rounded-lg border border-slate-700 outline-none text-sm" required>
                 </div>
-                <input type="text" id="regUser" placeholder="Username" class="w-full p-3 mb-4 bg-slate-800 rounded border border-slate-700 outline-none" required>
-                <input type="password" id="regPass" placeholder="Password" class="w-full p-3 mb-4 bg-slate-800 rounded border border-slate-700 outline-none" required>
-                <input type="password" id="regConfirm" placeholder="Confirm Password" class="w-full p-3 mb-6 bg-slate-800 rounded border border-slate-700 outline-none" required>
-                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg font-bold transition transform hover:scale-105">Daftar</button>
+                <input type="text" id="regUser" placeholder="Username" class="w-full p-3 mb-3 bg-slate-800/50 rounded-lg border border-slate-700 outline-none text-sm" required>
+                <input type="password" id="regPass" placeholder="Password" class="w-full p-3 mb-3 bg-slate-800/50 rounded-lg border border-slate-700 outline-none text-sm" required>
+                <input type="password" id="regConfirm" placeholder="Konfirmasi Password" class="w-full p-3 mb-6 bg-slate-800/50 rounded-lg border border-slate-700 outline-none text-sm" required>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg font-bold text-sm shadow-lg shadow-green-600/30">DAFTAR</button>
+                <p class="mt-4 text-center text-xs text-slate-400">Sudah ada akun? <a href="#" onclick="toggleAuth('login')" class="text-blue-400 font-bold">Login</a></p>
             </form>
-            <p class="mt-4 text-center text-sm text-gray-400">Sudah punya akun? <a href="#" onclick="toggleAuth('login')" class="text-blue-400 hover:underline">Login</a></p>
         </div>
     </div>
 
-    <div id="mainApp" class="hidden flex h-full">
-        <aside class="w-64 glass flex flex-col p-4 border-r border-slate-700/50">
-            <h2 class="text-2xl font-bold text-blue-400 mb-8 flex items-center gap-2">
-                <i class="fa-solid fa-robot"></i> Xayz AI
-            </h2>
-            
-            <nav class="flex-1 space-y-2">
-                <p class="text-xs text-gray-500 uppercase font-semibold mb-2 ml-2">Text & Multimodal</p>
-                <div class="sidebar-item p-3 rounded-lg flex items-center gap-3 active" onclick="switchModel('gemini')">
-                    <i class="fa-solid fa-star text-yellow-400"></i> Gemini
-                </div>
-                <div class="sidebar-item p-3 rounded-lg flex items-center gap-3" onclick="switchModel('chatgpt')">
-                    <i class="fa-solid fa-bolt text-green-400"></i> ChatGPT
-                </div>
-                <div class="sidebar-item p-3 rounded-lg flex items-center gap-3" onclick="switchModel('bing')">
-                    <i class="fa-brands fa-microsoft text-blue-400"></i> Bing AI
-                </div>
-                <div class="sidebar-item p-3 rounded-lg flex items-center gap-3" onclick="switchModel('blackbox')">
-                    <i class="fa-solid fa-cube text-gray-400"></i> Blackbox
-                </div>
+    <div id="mainApp" class="hidden h-full flex relative">
+        
+        <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 z-40 hidden md:hidden glass"></div>
 
-                <p class="text-xs text-gray-500 uppercase font-semibold mt-6 mb-2 ml-2">Image Generation</p>
-                <div class="sidebar-item p-3 rounded-lg flex items-center gap-3" onclick="switchModel('img-openai')">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 transform -translate-x-full md:relative md:translate-x-0 flex flex-col h-full">
+            <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+                <h2 class="text-xl font-bold text-blue-400 flex items-center gap-2"><i class="fa-solid fa-robot"></i> Xayz AI</h2>
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            
+            <nav class="flex-1 overflow-y-auto p-3 space-y-1">
+                <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-2">Chat Models</p>
+                <button onclick="switchModel('gemini')" class="sidebar-item w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm hover:bg-slate-800 transition active bg-blue-600/20 text-blue-400">
+                    <i class="fa-solid fa-star text-yellow-400"></i> Gemini Flash
+                </button>
+                <button onclick="switchModel('chatgpt')" class="sidebar-item w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm hover:bg-slate-800 transition text-slate-300">
+                    <i class="fa-solid fa-bolt text-green-400"></i> ChatGPT
+                </button>
+                <button onclick="switchModel('bing')" class="sidebar-item w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm hover:bg-slate-800 transition text-slate-300">
+                    <i class="fa-brands fa-microsoft text-blue-400"></i> Bing AI
+                </button>
+                <button onclick="switchModel('blackbox')" class="sidebar-item w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm hover:bg-slate-800 transition text-slate-300">
+                    <i class="fa-solid fa-cube text-gray-400"></i> Blackbox
+                </button>
+
+                <p class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 mt-6">Image Gen</p>
+                <button onclick="switchModel('img-openai')" class="sidebar-item w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm hover:bg-slate-800 transition text-slate-300">
                     <i class="fa-solid fa-image text-purple-400"></i> OpenAI Image
-                </div>
-                <div class="sidebar-item p-3 rounded-lg flex items-center gap-3" onclick="switchModel('img-sd')">
-                    <i class="fa-solid fa-paintbrush text-pink-400"></i> Stable Diffusion
-                </div>
+                </button>
+                <button onclick="switchModel('img-sd')" class="sidebar-item w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm hover:bg-slate-800 transition text-slate-300">
+                    <i class="fa-solid fa-paintbrush text-pink-400"></i> Stable Diff
+                </button>
             </nav>
 
-            <div class="mt-auto pt-4 border-t border-slate-700">
-                <button onclick="logout()" class="w-full text-left p-2 hover:text-red-400 transition text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-sign-out-alt"></i> Keluar
+            <div class="p-4 border-t border-slate-800 bg-slate-900">
+                <button onclick="logout()" class="w-full flex items-center gap-2 text-sm text-red-400 hover:text-red-300 transition">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col relative">
-            <header class="p-4 glass flex justify-between items-center z-10">
-                <h3 id="currentModelTitle" class="text-xl font-semibold">Gemini</h3>
+        <main class="flex-1 flex flex-col h-full w-full relative bg-slate-900">
+            
+            <header class="h-16 glass flex items-center justify-between px-4 z-30 sticky top-0">
                 <div class="flex items-center gap-3">
-                    <span id="welcomeMsg" class="text-gray-300 font-medium">Halo, User</span>
-                    <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center font-bold">U</div>
+                    <button onclick="toggleSidebar()" class="md:hidden p-2 text-white hover:bg-slate-700 rounded-lg">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                    <h3 id="currentModelTitle" class="font-semibold text-lg truncate">Gemini Flash</h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-xs font-bold shadow-lg shadow-blue-500/30">U</div>
                 </div>
             </header>
 
-            <div id="chatContainer" class="flex-1 overflow-y-auto p-6 flex flex-col gap-2">
-                <div class="text-center mt-10 opacity-50">
-                    <i class="fa-solid fa-microchip text-6xl mb-4 text-blue-500"></i>
-                    <h2 class="text-2xl">Mulai percakapan dengan <span id="modelNameDisplay">Gemini</span></h2>
-                    <p class="text-sm mt-2">Saya siap membantu tugas coding, menulis, atau analisis.</p>
-                </div>
-                </div>
-
-            <div id="imageContainer" class="hidden flex-1 p-6 flex flex-col items-center justify-center gap-6">
-                <div id="imagePlaceholder" class="text-center text-gray-500">
-                    <i class="fa-solid fa-image text-6xl mb-4"></i>
-                    <p>Masukkan prompt untuk membuat gambar.</p>
-                </div>
-                <div id="imageResult" class="hidden relative group">
-                    <img id="generatedImg" src="" class="rounded-xl shadow-2xl max-h-[60vh] border-2 border-slate-700" alt="Generated AI">
-                    <a id="downloadBtn" href="" download="xayz-ai-image.jpg" class="absolute bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow-lg opacity-0 group-hover:opacity-100 transition">
-                        <i class="fa-solid fa-download"></i> Download
-                    </a>
-                </div>
-                <div id="imageLoader" class="hidden flex flex-col items-center">
-                    <div class="loader mb-2"></div>
-                    <p class="text-sm animate-pulse">Sedang melukis imajinasimu...</p>
+            <div id="chatContainer" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 pb-20">
+                <div class="flex flex-col items-center justify-center h-full text-center opacity-40 mt-10">
+                    <i class="fa-solid fa-robot text-6xl mb-4 text-slate-600"></i>
+                    <p class="text-sm">Pilih AI di sidebar & mulai percakapan.</p>
                 </div>
             </div>
 
-            <div class="p-4 glass m-4 rounded-xl">
-                <div id="filePreview" class="hidden mb-2 p-2 bg-slate-800 rounded-lg flex items-center gap-2 w-max">
-                    <i class="fa-solid fa-paperclip text-gray-400"></i>
-                    <span id="fileName" class="text-xs text-gray-300 truncate max-w-xs">file.jpg</span>
-                    <button onclick="clearFile()" class="text-red-400 hover:text-red-300"><i class="fa-solid fa-times"></i></button>
+            <div id="imageContainer" class="hidden flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center">
+                <div id="imagePlaceholder" class="text-center opacity-50">
+                    <i class="fa-solid fa-image text-6xl mb-4"></i>
+                    <p>Masukkan prompt untuk membuat gambar.</p>
+                </div>
+                <div id="imageResult" class="hidden text-center">
+                    <img id="generatedImg" class="rounded-lg shadow-2xl max-h-[50vh] border border-slate-700 mx-auto" alt="AI Generated">
+                    <a id="downloadBtn" href="#" download="image.jpg" class="inline-block mt-4 bg-blue-600 px-4 py-2 rounded text-sm"><i class="fa-solid fa-download"></i> Simpan Gambar</a>
+                </div>
+                <div id="imageLoader" class="hidden flex flex-col items-center">
+                    <div class="loader mb-4 scale-150"></div>
+                    <p class="text-xs animate-pulse">Melukis imajinasi...</p>
+                </div>
+            </div>
+
+            <div class="p-3 bg-slate-900 border-t border-slate-800">
+                <div id="filePreview" class="hidden mb-2 p-2 bg-slate-800 rounded flex items-center justify-between w-max max-w-full">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <i class="fa-solid fa-paperclip text-blue-400"></i>
+                        <span id="fileName" class="text-xs text-slate-300 truncate">file.jpg</span>
+                    </div>
+                    <button onclick="clearFile()" class="ml-2 text-red-400"><i class="fa-solid fa-times"></i></button>
                 </div>
 
-                <div class="flex gap-2 items-end">
-                    <label id="uploadBtn" for="fileInput" class="p-3 bg-slate-700 hover:bg-slate-600 rounded-lg cursor-pointer transition text-gray-300">
+                <div class="flex gap-2 items-center bg-slate-800 p-1.5 rounded-xl border border-slate-700 focus-within:border-blue-500 transition">
+                    <label id="uploadBtn" for="fileInput" class="p-3 text-slate-400 hover:text-white cursor-pointer transition">
                         <i class="fa-solid fa-plus"></i>
                     </label>
                     <input type="file" id="fileInput" class="hidden" onchange="handleFileSelect(this)">
 
-                    <textarea id="promptInput" rows="1" placeholder="Ketik sesuatu..." class="flex-1 bg-transparent border-none outline-none text-white resize-none py-3 px-2 max-h-32"></textarea>
+                    <textarea id="promptInput" rows="1" placeholder="Ketik pesan..." class="flex-1 bg-transparent border-none outline-none text-white text-sm max-h-24 resize-none py-2"></textarea>
                     
-                    <button onclick="sendRequest()" id="sendBtn" class="p-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition shadow-lg shadow-blue-600/30">
+                    <button onclick="sendRequest()" id="sendBtn" class="p-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white transition shadow-lg shadow-blue-600/20 flex-shrink-0">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
@@ -165,68 +170,84 @@
     </div>
 
     <script>
-        let currentModel = 'gemini'; // Default
-        let currentUser = null;
+        let currentModel = 'gemini';
         let isGenerating = false;
         let selectedFile = null;
 
-        // --- AUTH LOGIC ---
-        function toggleAuth(page) {
-            if(page === 'register') {
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('registerForm').classList.remove('hidden');
+        // UI Logic
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            // Cek apakah sedang buka atau tutup
+            if (sb.classList.contains('-translate-x-full')) {
+                sb.classList.remove('-translate-x-full'); // Munculkan
+                overlay.classList.remove('hidden');
             } else {
-                document.getElementById('registerForm').classList.add('hidden');
-                document.getElementById('loginForm').classList.remove('hidden');
+                sb.classList.add('-translate-x-full'); // Sembunyikan
+                overlay.classList.add('hidden');
             }
         }
 
+        // Auto resize textarea
+        const tx = document.getElementById('promptInput');
+        tx.addEventListener("input", function(){
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight) + "px";
+            if(this.value === '') this.style.height = "auto";
+        });
+
+        // --- CORE LOGIC (AUTH & CHAT) ---
+        // (Sama seperti sebelumnya, tapi disederhanakan untuk UI baru)
+
         async function handleLogin(e) {
             e.preventDefault();
-            const username = document.getElementById('loginUser').value;
-            const password = document.getElementById('loginPass').value;
-            const remember = document.getElementById('rememberMe').checked;
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "Loading...";
+            
+            const u = document.getElementById('loginUser').value;
+            const p = document.getElementById('loginPass').value;
+            const r = document.getElementById('rememberMe').checked;
 
             try {
                 const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ username, password, remember })
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username: u, password: p, remember: r })
                 });
                 const data = await res.json();
-                
-                if(data.success) {
-                    initApp(data.user);
-                } else {
-                    alert(data.error);
-                }
-            } catch(err) { alert("Error connecting to server"); }
+                if(data.success) initApp(data.user);
+                else alert(data.error);
+            } catch(err) { alert("Koneksi Error"); }
+            btn.innerText = originalText;
         }
 
         async function handleRegister(e) {
             e.preventDefault();
-            const username = document.getElementById('regUser').value;
-            const password = document.getElementById('regPass').value;
-            const confirm = document.getElementById('regConfirm').value;
-            const first = document.getElementById('regFirst').value;
-            const last = document.getElementById('regLast').value;
+            const u = document.getElementById('regUser').value;
+            const p = document.getElementById('regPass').value;
+            const c = document.getElementById('regConfirm').value;
+            const f = document.getElementById('regFirst').value;
+            const l = document.getElementById('regLast').value;
 
-            if(password !== confirm) return alert("Password tidak cocok!");
+            if(p !== c) return alert("Password beda!");
 
-            try {
-                const res = await fetch('/api/register', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ username, password, firstName: first, lastName: last })
-                });
-                const data = await res.json();
-                if(data.message) {
-                    alert(data.message);
-                    toggleAuth('login');
-                } else {
-                    alert(data.error);
-                }
-            } catch(err) { alert("Error connecting to server"); }
+            const res = await fetch('/api/register', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username: u, password: p, firstName: f, lastName: l })
+            });
+            const data = await res.json();
+            if(data.message) { alert(data.message); toggleAuth('login'); }
+            else alert(data.error);
+        }
+
+        function toggleAuth(page) {
+            document.getElementById('loginForm').classList.toggle('hidden');
+            document.getElementById('registerForm').classList.toggle('hidden');
+        }
+
+        function initApp(user) {
+            document.getElementById('authPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
         }
 
         async function checkSession() {
@@ -234,14 +255,7 @@
                 const res = await fetch('/api/me');
                 const data = await res.json();
                 if(data.loggedIn) initApp(data.user);
-            } catch(e) {}
-        }
-
-        function initApp(user) {
-            currentUser = user;
-            document.getElementById('authPage').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            document.getElementById('welcomeMsg').innerText = `Halo, ${user.firstName}`;
+            } catch(e){}
         }
 
         async function logout() {
@@ -249,47 +263,37 @@
             window.location.reload();
         }
 
-        // --- MAIN APP LOGIC ---
-        
         function switchModel(model) {
             currentModel = model;
-            
-            // Update Sidebar UI
-            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active', 'bg-blue-600'));
-            event.currentTarget.classList.add('active', 'bg-blue-600');
+            // Update UI Sidebar Active State
+            document.querySelectorAll('.sidebar-item').forEach(el => {
+                el.classList.remove('bg-blue-600/20', 'text-blue-400');
+                el.classList.add('text-slate-300');
+            });
+            event.currentTarget.classList.remove('text-slate-300');
+            event.currentTarget.classList.add('bg-blue-600/20', 'text-blue-400');
 
-            // Update Header & Logic
-            const titles = {
-                'gemini': 'Gemini Flash',
-                'chatgpt': 'ChatGPT',
-                'bing': 'Bing AI',
-                'blackbox': 'Blackbox',
-                'img-openai': 'OpenAI Image Gen',
-                'img-sd': 'Stable Diffusion'
-            };
+            // Judul Header
+            const titles = { 'gemini': 'Gemini Flash', 'chatgpt': 'ChatGPT', 'bing': 'Bing AI', 'blackbox': 'Blackbox', 'img-openai': 'OpenAI Image', 'img-sd': 'Stable Diffusion' };
             document.getElementById('currentModelTitle').innerText = titles[model];
-            document.getElementById('modelNameDisplay').innerText = titles[model];
 
-            // Toggle Upload Button (Only Gemini supports files here)
-            const uploadBtn = document.getElementById('uploadBtn');
-            if (model === 'gemini') {
-                uploadBtn.classList.remove('hidden');
-            } else {
-                uploadBtn.classList.add('hidden');
-                clearFile();
-            }
+            // Show/Hide Upload
+            const upBtn = document.getElementById('uploadBtn');
+            if(model === 'gemini') upBtn.classList.remove('hidden'); else { upBtn.classList.add('hidden'); clearFile(); }
 
-            // Toggle View (Chat vs Image)
-            if (model.startsWith('img-')) {
+            // Toggle Chat/Image View
+            if(model.startsWith('img-')) {
                 document.getElementById('chatContainer').classList.add('hidden');
                 document.getElementById('imageContainer').classList.remove('hidden');
             } else {
                 document.getElementById('imageContainer').classList.add('hidden');
                 document.getElementById('chatContainer').classList.remove('hidden');
             }
+            
+            // Tutup sidebar otomatis di mobile setelah pilih
+            if(window.innerWidth < 768) toggleSidebar();
         }
 
-        // File Handling
         function handleFileSelect(input) {
             if(input.files && input.files[0]) {
                 selectedFile = input.files[0];
@@ -297,7 +301,6 @@
                 document.getElementById('fileName').innerText = selectedFile.name;
             }
         }
-
         function clearFile() {
             selectedFile = null;
             document.getElementById('fileInput').value = '';
@@ -305,117 +308,88 @@
         }
 
         function addMessage(text, sender) {
-            const container = document.getElementById('chatContainer');
+            const c = document.getElementById('chatContainer');
             const div = document.createElement('div');
             div.className = `chat-bubble ${sender === 'user' ? 'user-msg' : 'ai-msg'}`;
-            
-            if (sender === 'ai') {
-                // Render Markdown for AI
-                div.innerHTML = marked.parse(text);
-            } else {
-                div.innerText = text;
-            }
-            
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            div.innerHTML = sender === 'ai' ? marked.parse(text) : text;
+            c.appendChild(div);
+            c.scrollTop = c.scrollHeight;
         }
 
         async function sendRequest() {
             if(isGenerating) return;
-            
-            const promptInput = document.getElementById('promptInput');
-            const message = promptInput.value.trim();
-
-            if(!message && !selectedFile) return;
+            const txt = document.getElementById('promptInput');
+            const msg = txt.value.trim();
+            if(!msg && !selectedFile) return;
 
             isGenerating = true;
-            document.getElementById('sendBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.innerHTML = '<div class="loader"></div>';
 
-            // --- IMAGE GENERATION ---
-            if (currentModel.startsWith('img-')) {
-                promptInput.value = '';
+            if(currentModel.startsWith('img-')) {
+                // Image Logic
                 document.getElementById('imagePlaceholder').classList.add('hidden');
                 document.getElementById('imageResult').classList.add('hidden');
                 document.getElementById('imageLoader').classList.remove('hidden');
+                txt.value = '';
 
                 try {
                     const res = await fetch('/api/image', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ 
-                            prompt: message, 
-                            model: currentModel === 'img-openai' ? 'openai' : 'stablediffusion' 
-                        })
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ prompt: msg, model: currentModel === 'img-openai' ? 'openai' : 'stablediffusion' })
                     });
                     const data = await res.json();
-                    
                     document.getElementById('imageLoader').classList.add('hidden');
                     document.getElementById('imageResult').classList.remove('hidden');
                     document.getElementById('generatedImg').src = data.imageUrl;
                     document.getElementById('downloadBtn').href = data.imageUrl;
-                } catch (e) {
-                    alert("Gagal membuat gambar.");
-                    document.getElementById('imageLoader').classList.add('hidden');
-                }
-
-            } 
-            // --- TEXT / CHAT GENERATION ---
-            else {
-                addMessage(message, 'user');
-                promptInput.value = '';
-                clearFile(); // Clear file UI after send
-
-                // Show loading bubble
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'chat-bubble ai-msg';
-                loadingDiv.innerHTML = '<div class="loader" style="width:16px; height:16px; border-width:2px;"></div>';
-                loadingDiv.id = 'loadingBubble';
-                document.getElementById('chatContainer').appendChild(loadingDiv);
+                } catch(e) { alert("Gagal generate gambar"); document.getElementById('imageLoader').classList.add('hidden'); }
+            } else {
+                // Chat Logic
+                addMessage(msg, 'user');
+                txt.value = '';
+                clearFile();
+                
+                // Loading Bubble
+                const loadDiv = document.createElement('div');
+                loadDiv.className = 'chat-bubble ai-msg';
+                loadDiv.innerHTML = '<div class="loader" style="background: #aaa"></div>';
+                loadDiv.id = 'loadingBubble';
+                document.getElementById('chatContainer').appendChild(loadDiv);
+                document.getElementById('chatContainer').scrollTop = document.getElementById('chatContainer').scrollHeight;
 
                 try {
-                    let endpoint = '/api/chat';
-                    let bodyData = {};
-                    let headers = {};
-
-                    if (currentModel === 'gemini') {
-                        endpoint = '/api/gemini';
-                        const formData = new FormData();
-                        formData.append('message', message);
-                        if (selectedFile) formData.append('file', selectedFile);
-                        
-                        // FormData handles headers automatically
-                        const res = await fetch(endpoint, { method: 'POST', body: formData });
-                        const data = await res.json();
-                        handleResponse(data.reply);
-
+                    let endpoint = currentModel === 'gemini' ? '/api/gemini' : '/api/chat';
+                    let opts = {};
+                    
+                    if(currentModel === 'gemini') {
+                        const fd = new FormData();
+                        fd.append('message', msg);
+                        if(selectedFile) fd.append('file', selectedFile);
+                        opts = { method: 'POST', body: fd };
                     } else {
-                        // Other bots
-                        const res = await fetch(endpoint, {
-                            method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
-                            body: JSON.stringify({ message, model: currentModel })
-                        });
-                        const data = await res.json();
-                        handleResponse(data.reply);
+                        opts = {
+                            method: 'POST', headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ message: msg, model: currentModel })
+                        };
                     }
-                } catch (e) {
-                    handleResponse("Maaf, terjadi kesalahan atau server timeout.");
+                    
+                    const res = await fetch(endpoint, opts);
+                    const data = await res.json();
+                    
+                    if(document.getElementById('loadingBubble')) document.getElementById('loadingBubble').remove();
+                    addMessage(data.reply, 'ai');
+
+                } catch(e) {
+                    if(document.getElementById('loadingBubble')) document.getElementById('loadingBubble').remove();
+                    addMessage("Maaf, server sibuk.", 'ai');
                 }
             }
-
-            function handleResponse(reply) {
-                const loader = document.getElementById('loadingBubble');
-                if(loader) loader.remove();
-                addMessage(reply, 'ai');
-                isGenerating = false;
-                document.getElementById('sendBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
-            }
-            
             isGenerating = false;
-            document.getElementById('sendBtn').innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+            sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+            txt.style.height = 'auto'; // Reset height
         }
 
-        // Check session on load
         checkSession();
     </script>
 </body>
