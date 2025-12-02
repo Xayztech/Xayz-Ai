@@ -11,13 +11,16 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-
 const upload = multer({ dest: '/tmp/' }); 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "MASUKKAN_KEY_GEMINI_DISINI_JIKA_LOKAL"; 
 const BOTCAHX_API_KEY = process.env.BOTCAHX_API_KEY || "XYCoolcraftNihBoss"; 
