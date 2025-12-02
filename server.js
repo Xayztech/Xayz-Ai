@@ -132,7 +132,7 @@ app.post('/api/gemini', upload.single('file'), async (req, res) => {
         if(file) console.log("File diterima:", file.mimetype);
 
         // 2. Inisialisasi Model
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         
         let result;
         if (file) {
