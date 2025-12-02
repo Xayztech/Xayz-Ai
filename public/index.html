@@ -130,10 +130,9 @@
                         <input type="password" id="loginPass" class="w-full p-3 rounded-xl auth-input outline-none" placeholder="Masukan password" required>
                     </div>
                     <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-indigo-600/30 transition transform hover:scale-[1.02]">MASUK</button>
+                    <p class="mt-6 text-center text-sm text-gray-400">Belum punya akun? <span class="text-indigo-400 font-bold cursor-pointer hover:underline" onclick="toggleAuth('register')">Daftar</span></p>
                 </form>
 
-                <p class="mt-6 text-sm text-gray-400">Belum punya akun? <span class="text-indigo-400 font-bold cursor-pointer hover:underline" onclick="toggleAuth('register')">Daftar</span></p>
-                
                 <form id="registerForm" onsubmit="handleRegister(event)" class="hidden text-left space-y-4 mt-4 animate-[fadeIn_0.5s]">
                     <div class="grid grid-cols-2 gap-3">
                         <input type="text" id="regFirst" placeholder="Nama Depan" class="p-3 rounded-xl auth-input outline-none" required>
@@ -180,7 +179,7 @@
                     <i class="fa-solid fa-image"></i> OpenAI Image
                 </div>
                 <div onclick="switchModel('img-sd')" class="sidebar-item sidebar-inactive">
-                    <i class="fa-solid fa-palette"></i> Stable Diff
+                    <i class="fa-solid fa-palette"></i> Stablediffusion
                 </div>
             </nav>
 
@@ -299,8 +298,17 @@
         }
 
         function toggleAuth(page) {
-            if(page==='register') { document.getElementById('loginForm').parentElement.querySelector('#loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); }
-            else { document.getElementById('registerForm').classList.add('hidden'); document.getElementById('loginForm').classList.remove('hidden'); }
+            // FIX LOGIC: Simply toggle hidden classes on the forms themselves
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            if(page === 'register') {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+            } else {
+                registerForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+            }
         }
 
         function initApp(user) {
@@ -346,17 +354,16 @@
             const welcomeTitle = document.getElementById('welcomeTitle');
             const welcomeSub = document.getElementById('welcomeSubtitle');
             
-            // Nama User (First Name)
             let userName = currentUser ? currentUser.firstName : 'Pengguna';
 
             if (model === 'gemini') {
-                upWrapper.classList.remove('hidden'); // Show Upload
+                upWrapper.classList.remove('hidden'); 
                 welcomeTitle.innerHTML = `Halo, <span class="gradient-text">${userName}</span>`;
                 welcomeTitle.className = '';
                 welcomeSub.innerText = 'Ada yang bisa saya bantu?';
                 renderSuggestions('gemini');
             } else if (model === 'chatgpt') {
-                upWrapper.classList.add('hidden'); // Hide Upload
+                upWrapper.classList.add('hidden'); 
                 welcomeTitle.innerHTML = `Halo, ${userName}`;
                 welcomeTitle.className = '';
                 welcomeSub.innerText = 'Apa yang ingin Anda tanyakan?';
